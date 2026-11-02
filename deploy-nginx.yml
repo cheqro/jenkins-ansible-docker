@@ -1,0 +1,22 @@
+---
+- name: Déploiement automatique de la page Nginx
+  hosts: app_servers
+  become: true
+  vars:
+    web_root: "/var/www/html"
+
+  tasks:
+    - name: Assurer la présence du dossier racine Nginx
+      ansible.builtin.file:
+        path: "{{ web_root }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copier le fichier index.html vers le serveur cible
+      ansible.builtin.copy:
+        src: "{{ html_path }}"
+        dest: "{{ web_root }}/index.html"
+        mode: '0644'
+
+    - name: Recharger le service Nginx
+      ansible.builtin.shell: "nginx -s reload || true"
